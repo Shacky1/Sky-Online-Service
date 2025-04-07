@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MaterialService {
@@ -18,8 +19,13 @@ public class MaterialService {
     }
 
     public Material getMaterial(Long id) {
-        return materialRepository.findById(id).orElse(null);
+        Optional<Material> material = materialRepository.findById(id);
+        if (material.isPresent()) {
+            return material.get();
+        }
+        return null;  // Ensure this is correctly handled in your controller
     }
+
 
     public Material saveMaterial(Material material) {
         return materialRepository.save(material);
