@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Page</title>
+</head>
+<body>
+<h1>Admin - Upload Materials</h1>
+<form th:action="@{/admin/upload}" method="post" enctype="multipart/form-data">
+    <label for="name">Material Name:</label>
+    <input type="text" id="name" name="name" required>
+    <label for="file">Upload File:</label>
+    <input type="file" id="file" name="file" required>
+    <button type="submit">Upload</button>
+</form>
+
+<!--<h2>Uploaded Materials</h2>-->
+<!--<ul>-->
+<!--    <li th:each="material : ${materials}">-->
+<!--        <span th:text="${material.name}"></span>-->
+<!--    </li>-->
+<!--</ul>-->
+
+</body>
+</html>
