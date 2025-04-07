@@ -48,11 +48,19 @@
 <!--			<scope>runtime</scope>-->
 <!--		</dependency>-->
 		<dependency>
+<<<<<<< HEAD
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>42.7.2</version>
 			<!--  Use latest stable version  -->
 		</dependency>
+=======
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>42.7.2</version> <!-- Use latest stable version -->
+</dependency>
+
+>>>>>>> e4d998625e56fbdf38bfbb4c2ce78bd65ccefed1
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
