@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Material Management - Admin</title>
 
     <!-- Bootstrap CSS -->
@@ -18,19 +19,19 @@
         }
 
         .admin-section {
-            padding: 60px 0;
+            padding: 40px 15px;
         }
 
         .form-container {
             background-color: #ffffff;
-            padding: 30px;
+            padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .footer {
-            margin-top: 80px;
-            padding: 20px 0;
+            margin-top: 40px;
+            padding: 20px 10px;
             background-color: #f8f9fa;
             text-align: center;
             color: #6c757d;
@@ -43,10 +44,19 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="#">Material Manager</a>
-        <div class="collapse navbar-collapse">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <form th:action="@{/admin/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-light btn-sm ms-3">Logout</button>
+                    </form>
                 </li>
             </ul>
         </div>
@@ -55,28 +65,47 @@
 
 <section class="admin-section">
     <div class="container">
-        <div class="form-container mx-auto" style="max-width: 600px;">
-            <h2 class="mb-4 text-center">Admin - Upload Materials</h2>
-            <form th:action="@{/admin/upload}" method="post" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Material Name</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+                <div class="form-container">
+                    <!-- Success Message -->
+                    <div th:if="${successMessage}" class="alert alert-success text-center" role="alert">
+                        <span th:text="${successMessage}">Upload successful!</span>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div th:if="${errorMessage}" class="alert alert-danger text-center" role="alert">
+                        <span th:text="${errorMessage}">Upload failed!</span>
+                    </div>
+
+                    <h2 class="mb-4 text-center">Admin - Upload Announcement</h2>
+                    <form th:action="@{/admin/upload}" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Upload File</label>
+                            <input type="file" class="form-control" id="file" name="file" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="validDays" class="form-label">Valid For (days)</label>
+                            <input type="number" class="form-control" id="validDays" name="validDays" required min="1" max="365">
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary w-100">Upload</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label for="file" class="form-label">Upload File</label>
-                    <input type="file" class="form-control" id="file" name="file" required>
-                </div>
-                <div class="text-center">
-                    <button type="submit" class="btn btn-primary px-5">Upload</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </section>
 
 <footer class="footer">
     <div class="container">
-        &copy; 2025 Material Management System. All rights reserved.
+        &copy; 2025 The Sky Online Service. All rights reserved.
     </div>
 </footer>
 

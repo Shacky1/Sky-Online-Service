@@ -5,6 +5,8 @@ import com.shacky.materialmanagement.repository.MaterialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +17,7 @@ public class MaterialService {
     private MaterialRepository materialRepository;
 
     public List<Material> getAllMaterials() {
-        return materialRepository.findAll();
+        return materialRepository.findByValidUntilAfter(LocalDateTime.now());
     }
 
     public Material getMaterial(Long id) {
@@ -30,4 +32,19 @@ public class MaterialService {
     public Material saveMaterial(Material material) {
         return materialRepository.save(material);
     }
+    public void removeOutdatedMaterials() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Material> outdatedMaterials = materialRepository.findByValidUntilBefore(now);
+
+        for (Material material : outdatedMaterials) {
+            File file = new File(material.getUrl());
+            if (file.exists()) {
+                file.delete();
+            }
+
+            materialRepository.delete(material);
+        }
+    }
+
+
 }
