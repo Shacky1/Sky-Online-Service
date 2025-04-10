@@ -3,47 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Material Management - Admin</title>
+    <title>The Sky online - Admin</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 
-    <style>
-        body {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .navbar {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .admin-section {
-            padding: 40px 15px;
-        }
-
-        .form-container {
-            background-color: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .footer {
-            margin-top: 40px;
-            padding: 20px 10px;
-            background-color: #f8f9fa;
-            text-align: center;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-    </style>
+    <!-- Custom Shared CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="#">Material Manager</a>
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="/images/kyline-logo.jpeg" alt="Sky Logo" style="height: 40px; margin-right: 10px;">
+            The Sky
+        </a>
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -63,22 +39,22 @@
     </div>
 </nav>
 
-<section class="admin-section">
+<section class="admin-section py-5">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+        <div class="row justify-content-center g-5">
+            <!-- Upload Announcement Form -->
+            <div class="col-md-6">
                 <div class="form-container">
-                    <!-- Success Message -->
+                    <h2 class="mb-4 text-center">Upload Announcement</h2>
+
                     <div th:if="${successMessage}" class="alert alert-success text-center" role="alert">
                         <span th:text="${successMessage}">Upload successful!</span>
                     </div>
 
-                    <!-- Error Message -->
                     <div th:if="${errorMessage}" class="alert alert-danger text-center" role="alert">
                         <span th:text="${errorMessage}">Upload failed!</span>
                     </div>
 
-                    <h2 class="mb-4 text-center">Admin - Upload Announcement</h2>
                     <form th:action="@{/admin/upload}" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="name" class="form-label">Title</label>
@@ -92,9 +68,39 @@
                             <label for="validDays" class="form-label">Valid For (days)</label>
                             <input type="number" class="form-control" id="validDays" name="validDays" required min="1" max="365">
                         </div>
-
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary w-100">Upload</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Add Online Service Form -->
+            <div class="col-md-6">
+                <div class="form-container">
+                    <h2 class="mb-4 text-center">Add Online Service</h2>
+
+                    <div th:if="${serviceSuccess}" class="alert alert-success text-center" role="alert">
+                        <span th:text="${serviceSuccess}">Service added successfully!</span>
+                    </div>
+
+                    <div th:if="${serviceError}" class="alert alert-danger text-center" role="alert">
+                        <span th:text="${serviceError}">Error adding service.</span>
+                    </div>
+
+                    <form th:action="@{/admin/services/add}" method="post">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Service Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="requirements" class="form-label">Requirements / Description</label>
+                            <textarea class="form-control" id="requirements" name="requirements" rows="4" required></textarea>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success w-100">Add Service</button>
                         </div>
                     </form>
                 </div>
@@ -103,12 +109,13 @@
     </div>
 </section>
 
-<footer class="footer">
-    <div class="container">
+<footer class="footer mt-5">
+    <div class="container text-center py-3">
         &copy; 2025 The Sky Online Service. All rights reserved.
     </div>
 </footer>
 
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

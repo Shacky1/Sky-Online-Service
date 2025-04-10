@@ -1,0 +1,103 @@
+/* style.css */
+
+body {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.hero-section {
+    padding: 40px 15px 20px;
+    text-align: center;
+}
+
+.materials-section {
+    padding: 20px 15px;
+}
+
+.material-card {
+    transition: all 0.3s ease;
+}
+
+.material-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.footer {
+    margin-top: 40px;
+    padding: 20px 10px;
+    background-color: #f8f9fa;
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.star-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 50px;
+    height: 50px;
+    color: white;
+    background-color: #dc3545;
+    clip-path: polygon(
+        50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%,
+        50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.7rem;
+    animation: pulse 1.5s infinite;
+}
+
+.btn-custom-download {
+    background-color: #343a40;
+    color: white;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    width: auto;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom-download:hover {
+    background-color: #23272b;
+}
+
+.services-section h2 {
+    font-weight: 600;
+}
+
+.services-section .card {
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.services-section .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.admin-section {
+    padding: 40px 15px;
+}
+
+.form-container {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

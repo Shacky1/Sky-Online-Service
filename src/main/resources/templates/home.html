@@ -8,59 +8,18 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 
-    <style>
-        body {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .navbar {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .hero-section {
-            padding: 40px 15px 20px;
-            text-align: center;
-        }
-
-        .materials-section {
-            padding: 20px 15px;
-        }
-
-        .material-card {
-            transition: all 0.3s ease;
-        }
-
-        .material-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .footer {
-            margin-top: 40px;
-            padding: 20px 10px;
-            background-color: #f8f9fa;
-            text-align: center;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .badge.bg-success {
-            animation: pulse 1.5s infinite;
-        }
-    </style>
+    <!-- Custom Shared CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="#">The sky</a>
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="/images/kyline-logo.jpeg" alt="Sky Logo" style="height: 40px; margin-right: 10px;">
+            The Sky
+        </a>
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -75,42 +34,55 @@
     </div>
 </nav>
 
-<section class="hero-section">
+<section class="hero-section text-center py-5">
     <div class="container">
+        <img src="/images/kyline-logo.jpeg" alt="Sky Logo" style="height: 80px;" class="mb-3">
         <h1 class="h3 h-md-1">Welcome to the Sky Online Service</h1>
         <p class="lead">Browse available Services below.</p>
     </div>
 </section>
 
+<section class="services-section py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4">Our Services</h2>
+        <div class="row g-4">
+            <div class="col-md-4" th:each="service : ${services}">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${service.title}">Service Title</h5>
+                        <p class="card-text" th:text="${#strings.abbreviate(service.requirements, 10)}">Service Requirements</p> <!-- Show a truncated version -->
+                        <a th:href="@{/service/{id}(id=${service.id})}" class="btn btn-primary mt-3">See More</a> <!-- Link to service details -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="materials-section">
     <div class="container">
+        <h2 class="text-center mb-4">Announcements</h2>
         <div class="row g-3" th:if="${materials.size() > 0}">
             <div class="col-12 col-sm-6 col-md-4" th:each="material : ${materials}">
                 <div class="card material-card h-100">
-                    <!-- Image Preview (if applicable) -->
                     <img th:if="${material.image}"
                          th:src="@{'/files/' + ${material.fileName}}"
                          class="card-img-top"
                          style="object-fit: cover; height: 200px;"
                          alt="Preview"/>
-                    
                     <div class="card-body position-relative">
                         <h5 class="card-title" th:text="${material.name}">Material Name</h5>
-
-                        <!-- New Badge -->
-                        <span class="badge bg-success position-absolute top-0 end-0 m-2"
+                        <span class="star-badge"
                               th:if="${material.uploadTime != null and T(java.time.temporal.ChronoUnit).DAYS.between(material.uploadTime, T(java.time.LocalDateTime).now()) == 0}">
-                NEW
-            </span>
-
+                            NEW
+                        </span>
                         <a th:href="@{/download/{id}(id=${material.id})}"
-                           class="btn btn-primary mt-3 w-100" target="_blank">
+                           class="btn btn-custom-download mt-3" target="_blank">
                             Download
                         </a>
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="alert alert-info text-center" th:if="${materials.size() == 0}">
@@ -119,9 +91,61 @@
     </div>
 </section>
 
-<footer class="footer">
+<section class="py-5 bg-white border-top">
     <div class="container">
-        &copy; 2025 The Sky Online Service. All rights reserved.
+        <div class="row">
+            <!-- University Info -->
+            <div class="col-md-4">
+                <img src="/images/kyline-logo.jpeg" alt="Sky Logo" style="height: 80px;">
+                <h5 class="mt-3">Sky Online Service</h5>
+                <p>
+                    The Sky Online Service is one of the oldest and most trusted stationery service providers in Tanzania.
+                    Strategically located in Dodoma,
+                    the service operates both online and offline to meet the growing demand for quality stationery products across the country.
+                    Established with a strong foundation of excellence and reliability,
+                    Sky Online Service has consistently provided a wide range of stationery solutions for students, professionals, institutions, and businesses. With years of experience and a reputation for outstanding service, Sky Online Service continues to lead the market by offering convenient, affordable, and accessible stationery services.
+                </p>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="col-md-4">
+                <h5 class="text-primary">Contact Info</h5>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-telephone-fill me-2"></i> Tel: (+255) 750 613 191</li>
+                    <li><i class="bi bi-envelope-fill me-2"></i> <a href="mailto:martinmasasila@gmail.com">martinmasasila@gmail.com</a></li>
+                    <li class="mt-2">
+                        <a href="#"><i class="bi bi-facebook me-2 fs-5"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x me-2 fs-5"></i></a>
+                        <a href="#"><i class="bi bi-youtube me-2 fs-5"></i></a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-md-4">
+                <h5 class="text-primary">Our Quick Links</h5>
+                <div class="d-grid gap-2">
+                    <a class="btn btn-outline-primary btn-sm" href="https://portal.ajira.go.tz/">Ajira portal</a>
+                    <a class="btn btn-outline-primary btn-sm" href="https://erita.rita.go.tz/">Rita</a>
+                    <a class="btn btn-outline-primary btn-sm" href="https://jobs.kazi.go.tz/">jobs.kazi.go.tz</a>
+                    <a class="btn btn-outline-primary btn-sm" href="https://taxpayerportal.tra.go.tz/">taxpayerportal.tra.go.tz</a>
+                    <a class="btn btn-outline-primary btn-sm" href="https://www.nactvet.go.tz/page/award-verification-number-avn">www.nactvet.go.tz</a>
+                    <a class="btn btn-outline-primary btn-sm" href="https://niajiri.co.tz/">niajiri.co.tz</a>
+                    <a class="btn btn-outline-primary btn-sm" href="https://www.heslb.go.tz/olams">heslb.go.tz</a>
+                    <a class="btn btn-outline-primary btn-sm" href="https://www.tcu.go.tz/">tcu.go.tz</a>
+                    <a class="btn btn-outline-primary btn-sm" href="https://nida.go.tz/">nida.go.tz</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer bg-dark text-white py-3">
+    <div class="container text-center">
+        <div>&copy; 2025 The Sky Online Service. All rights reserved.</div>
+        <div class="mt-1">
+            Developed by <a href="mailto:meshackvenance99@gmail.com" class="text-decoration-none text-info">Mr. Meshack Venance</a>
+        </div>
     </div>
 </footer>
 

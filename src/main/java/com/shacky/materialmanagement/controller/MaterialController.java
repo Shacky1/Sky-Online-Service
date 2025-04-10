@@ -2,9 +2,11 @@ package com.shacky.materialmanagement.controller;
 
 import com.shacky.materialmanagement.entity.Admin;
 import com.shacky.materialmanagement.entity.Material;
+import com.shacky.materialmanagement.entity.OnlineService;
 import com.shacky.materialmanagement.repository.AdminRepository;
 import com.shacky.materialmanagement.service.AdminService;
 import com.shacky.materialmanagement.service.MaterialService;
+import com.shacky.materialmanagement.service.OnlineServiceService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,14 +44,19 @@ public class MaterialController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    // Show homepage with list of materials
+    @Autowired
+    private OnlineServiceService onlineServiceService;
+
     @GetMapping("/")
     public String homePage(Model model) {
         List<Material> materials = materialService.getAllMaterials();
         model.addAttribute("materials", materials);
+
+        List<OnlineService> services = onlineServiceService.getAllServices();
+        model.addAttribute("services", services);
+
         return "home";
     }
-
 
     // Login form
     @GetMapping("/admin/login")
@@ -65,6 +72,35 @@ public class MaterialController {
         return "admin";
     }
 
+    // Handle adding online service
+    @PostMapping("/admin/services/add")
+    public String addOnlineService(@RequestParam("title") String title,
+                                   @RequestParam("requirements") String requirements,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            OnlineService onlineService = new OnlineService();
+            onlineService.setTitle(title);
+            onlineService.setRequirements(requirements);
+            onlineServiceService.saveService(onlineService);
+
+            redirectAttributes.addFlashAttribute("serviceSuccess", "Service added successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("serviceError", "Error adding service.");
+        }
+        return "redirect:/admin";
+    }
+    // New method to handle "See More" functionality
+    @GetMapping("/service/{id}")
+    public String viewServiceDetails(@PathVariable Long id, Model model) {
+        OnlineService onlineService = onlineServiceService.getService(id);
+        if (onlineService != null) {
+            model.addAttribute("service", onlineService);
+            return "service-details";  // A new view to display service details
+        } else {
+            model.addAttribute("errorMessage", "Service not found.");
+            return "error";
+        }
+    }
 
     // Handle file upload
     @PostMapping("/admin/upload")
