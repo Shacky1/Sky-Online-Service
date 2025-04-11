@@ -74,37 +74,52 @@
                     </form>
                 </div>
             </div>
-
-            <!-- Add Online Service Form -->
-            <div class="col-md-6">
-                <div class="form-container">
-                    <h2 class="mb-4 text-center">Add Online Service</h2>
-
-                    <div th:if="${serviceSuccess}" class="alert alert-success text-center" role="alert">
-                        <span th:text="${serviceSuccess}">Service added successfully!</span>
-                    </div>
-
-                    <div th:if="${serviceError}" class="alert alert-danger text-center" role="alert">
-                        <span th:text="${serviceError}">Error adding service.</span>
-                    </div>
-
-                    <form th:action="@{/admin/services/add}" method="post">
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Service Title</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="requirements" class="form-label">Requirements / Description</label>
-                            <textarea class="form-control" id="requirements" name="requirements" rows="4" required></textarea>
-                        </div>
-
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success w-100">Add Service</button>
-                        </div>
-                    </form>
+            <!-- Online Services List -->
+            <div class="mb-5">
+                <h3 class="text-center">Existing Online Services</h3>
+                <div th:if="${services != null and !services.isEmpty()}">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-start"
+                            th:each="service : ${services}">
+                            <div>
+                                <h5 th:text="${service.title}">Service Title</h5>
+                                <p th:text="${service.requirements}">Service Description</p>
+                            </div>
+                            <div>
+                                <a th:href="@{'/admin/services/edit/' + ${service.id}}" class="btn btn-warning btn-sm me-2">Edit</a>
+                                <a th:href="@{'/admin/services/delete/' + ${service.id}}"
+                                   onclick="return confirm('Are you sure you want to delete this service?');"
+                                   class="btn btn-danger btn-sm">Delete</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div th:if="${services == null or services.isEmpty()}" class="alert alert-info text-center">
+                    No online services added yet.
                 </div>
             </div>
+
+            <!-- Add/Edit Online Service Form -->
+            <h2 class="mb-4 text-center" th:text="${editService != null} ? 'Edit Online Service' : 'Add Online Service'">Add Online Service</h2>
+
+            <form th:action="${editService != null} ? @{/admin/services/update} : @{/admin/services/add}" method="post">
+                <input type="hidden" name="id" th:value="${editService?.id}" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Service Title</label>
+                    <input type="text" class="form-control" id="title" name="title" th:value="${editService?.title}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="requirements" class="form-label">Requirements / Description</label>
+                    <textarea class="form-control" id="requirements" name="requirements" rows="4" required
+                              th:text="${editService?.requirements}"></textarea>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success w-100"
+                            th:text="${editService != null} ? 'Update Service' : 'Add Service'">Add Service</button>
+                </div>
+            </form>
         </div>
     </div>
 </section>

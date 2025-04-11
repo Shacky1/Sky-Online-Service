@@ -69,8 +69,13 @@ public class MaterialController {
     public String showAdminPage(Model model) {
         List<Material> materials = materialService.getAllMaterials();
         model.addAttribute("materials", materials);
+
+        List<OnlineService> services = onlineServiceService.getAllServices();
+        model.addAttribute("services", services);
+
         return "admin";
     }
+
 
     // Handle adding online service
     @PostMapping("/admin/services/add")
@@ -175,9 +180,57 @@ public class MaterialController {
             return ResponseEntity.badRequest().build();
         }
     }
+    // Delete a service
+    @GetMapping("/admin/services/delete/{id}")
+    public String deleteOnlineService(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            onlineServiceService.deleteService(id);
+            redirectAttributes.addFlashAttribute("serviceSuccess", "Service deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("serviceError", "Failed to delete service.");
+        }
+        return "redirect:/admin";
+    }
+
+    // Show edit form for a service
+    @GetMapping("/admin/services/edit/{id}")
+    public String editOnlineService(@PathVariable Long id, Model model) {
+        OnlineService service = onlineServiceService.getService(id);
+        if (service != null) {
+            model.addAttribute("editService", service);
+            model.addAttribute("services", onlineServiceService.getAllServices()); // So the list still shows
+            return "admin"; // Reuse same page
+        } else {
+            model.addAttribute("serviceError", "Service not found.");
+            return "redirect:/admin";
+        }
+    }
+
+    // Handle POST update
+    @PostMapping("/admin/services/update")
+    public String updateOnlineService(@RequestParam Long id,
+                                      @RequestParam String title,
+                                      @RequestParam String requirements,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            OnlineService existing = onlineServiceService.getService(id);
+            if (existing != null) {
+                existing.setTitle(title);
+                existing.setRequirements(requirements);
+                onlineServiceService.saveService(existing);
+                redirectAttributes.addFlashAttribute("serviceSuccess", "Service updated successfully.");
+            } else {
+                redirectAttributes.addFlashAttribute("serviceError", "Service not found.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("serviceError", "Error updating service.");
+        }
+        return "redirect:/admin";
+    }
 
 
-    // Optional logout
+
+    // logout
     @GetMapping("/admin/logout")
     public String logout(HttpSession session) {
         session.invalidate();
