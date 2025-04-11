@@ -76,7 +76,6 @@ public class MaterialController {
         return "admin";
     }
 
-
     // Handle adding online service
     @PostMapping("/admin/services/add")
     public String addOnlineService(@RequestParam("title") String title,
@@ -94,6 +93,7 @@ public class MaterialController {
         }
         return "redirect:/admin";
     }
+
     // New method to handle "See More" functionality
     @GetMapping("/service/{id}")
     public String viewServiceDetails(@PathVariable Long id, Model model) {
@@ -227,7 +227,45 @@ public class MaterialController {
         }
         return "redirect:/admin";
     }
+    @GetMapping("/services")
+    public String viewServices(Model model) {
+        List<OnlineService> services = onlineServiceService.getAllServices();
+        model.addAttribute("services", services);
+        return "services";
+    }
+    @PostMapping("/admin/change-password")
+    public String changePassword(HttpServletRequest request,
+                                 @RequestParam String currentPassword,
+                                 @RequestParam String newPassword,
+                                 @RequestParam String confirmPassword,
+                                 RedirectAttributes redirectAttributes) {
 
+        String username = request.getUserPrincipal().getName(); // Current logged-in admin
+        Optional<Admin> optionalAdmin = adminService.findByUsername(username);
+
+        if (optionalAdmin.isEmpty()) {
+            redirectAttributes.addFlashAttribute("passwordError", "Admin not found.");
+            return "redirect:/admin";
+        }
+
+        Admin admin = optionalAdmin.get();
+
+        if (!passwordEncoder.matches(currentPassword, admin.getPassword())) {
+            redirectAttributes.addFlashAttribute("passwordError", "Current password is incorrect.");
+            return "redirect:/admin";
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("passwordError", "New passwords do not match.");
+            return "redirect:/admin";
+        }
+
+        admin.setPassword(passwordEncoder.encode(newPassword));
+        adminService.save(admin);
+
+        redirectAttributes.addFlashAttribute("passwordSuccess", "Password changed successfully.");
+        return "redirect:/admin";
+    }
 
 
     // logout
