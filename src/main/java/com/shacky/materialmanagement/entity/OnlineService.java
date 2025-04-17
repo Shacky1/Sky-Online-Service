@@ -14,6 +14,8 @@ public class OnlineService {
     @Column(length = 2000)
     private String requirements;
 
+    private Integer cost;
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -37,5 +39,13 @@ public class OnlineService {
 
     public void setRequirements(String requirements) {
         this.requirements = requirements;
+    }
+
+    public Integer getCost() {
+        return cost;
+    }
+
+    public void setCost(Integer cost) {
+        this.cost = cost;
     }
 }

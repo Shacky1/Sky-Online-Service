@@ -2,102 +2,305 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Service Details - The Sky Online</title>
-
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
-    <!-- Custom Shared CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
+        body { font-family: 'Inter', sans-serif; }
         .requirements-box {
-            background-color: #f8f9fa;
-            border-left: 5px solid #0d6efd;
+            background: #f8f9fa;
             padding: 1.5rem;
-            border-radius: 0.5rem;
-            font-size: 1rem;
+            border-left: 5px solid #0d6efd;
+            border-radius: .5rem;
             white-space: pre-wrap;
-            line-height: 1.6;
         }
-
-        .section-title {
-            font-weight: 600;
-        }
-
-        .btn-secondary {
-            font-weight: 500;
-        }
+        .valid { color: green; }
+        .invalid { color: gray; text-decoration: line-through; }
     </style>
 </head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="/">
-            <img src="/images/kyline-logo.jpeg" alt="Sky Logo" style="height: 40px; margin-right: 10px;">
-            The Sky
+        <a class="navbar-brand" href="/">
+            <img src="/images/kyline-logo.jpeg" style="height: 40px;" alt="Logo"> The Sky
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/admin}">Admin</a>
-                </li>
-            </ul>
-        </div>
+        <a class="btn btn-outline-light" href="/admin">
+            <i class="bi bi-lock-fill me-1"></i> Admin
+        </a>
     </div>
 </nav>
 
-<!-- Hero Section (UNCHANGED) -->
-<section class="hero-section text-center py-5">
+<section class="py-5 text-center">
     <div class="container">
         <img src="/images/kyline-logo.jpeg" alt="Sky Logo" style="height: 80px;" class="mb-3">
-        <h1 class="h3 h-md-1">Service Details</h1>
-        <p class="lead">Learn more about the service below.</p>
+        <h1 class="h3">Service Details</h1>
+        <p class="lead">Learn more about the selected service</p>
     </div>
 </section>
 
-<!-- Service Details Section -->
-<section class="service-details-section py-5">
-    <div class="container">
-        <h2 class="text-center mb-4 section-title" th:text="${service.title}">Service Title</h2>
-        <div class="requirements-box mx-auto mb-4" th:text="${service.requirements}">
-            Service Requirements will appear here...
-        </div>
-        <div class="text-center">
-            <a href="/services" class="btn btn-secondary">Back to Services</a>
-        </div>
+<section class="container mb-4">
+    <h2 class="text-center" th:text="${service.title}">Service Title</h2>
+    <div class="requirements-box mb-3" th:text="${service.requirements}">Service requirements...</div>
+    <p><strong><i class="bi bi-cash-coin me-1"></i>Cost:</strong>
+        <span th:if="${service.cost == null}">Not assigned</span>
+        <span th:if="${service.cost == 0}">Free</span>
+        <span th:if="${service.cost > 0}" th:text="'TSH ' + ${#numbers.formatDecimal(service.cost, 0, 'COMMA', 0, 'POINT')}">TSH 0</span>
+    </p>
+
+    <div class="text-center">
+        <a href="/services" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle me-1"></i> Back to Services
+        </a>
+        <button class="btn btn-success ms-3"
+                onclick="showOrderForm()"
+                th:if="${session.loggedInCustomer == null}">
+            <i class="bi bi-cart-plus me-1"></i> Get Service
+        </button>
+
+        <form th:action="@{'/orders/add-service/' + ${service.id}}" method="post"
+              th:if="${session.loggedInCustomer != null}" style="display: inline;">
+            <button type="submit" class="btn btn-success ms-3">
+                <i class="bi bi-plus-circle me-1"></i> Add Service to My Orders
+            </button>
+        </form>
     </div>
 </section>
 
-<!-- Footer -->
-<footer class="footer bg-dark text-white py-3 mt-5">
-    <div class="container text-center">
-        <div>&copy; 2025 The Sky Online Service. All rights reserved.</div>
-        <div class="mt-1">
-            Developed by
-            <a href="mailto:meshackvenance99@gmail.com" class="text-decoration-none text-info">
-                Mr. Meshack Venance
-            </a>
+<!-- Order Form Modal -->
+<div class="modal fade" id="orderFormModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/orders/place}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Place an Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="serviceId" th:value="${service.id}" />
+
+                    <div class="mb-3">
+                        <label>First Name</label>
+                        <input type="text" name="firstName" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Last Name</label>
+                        <input type="text" name="lastName" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Phone Number</label>
+                        <input type="tel" name="phoneNumber" class="form-control" required
+                               pattern="^0(6|7|8)[0-9]{8}$"
+                               title="Phone number must start with 06, 07, or 08 and be 10 digits long (e.g., 0712345678)">
+                        <small id="phoneHint" class="text-muted">Format: 07XXXXXXXX</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Region</label>
+                        <select name="region" id="region" class="form-control" required onchange="updateDistricts()">
+                            <option value="">Select Region</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>District</label>
+                        <select name="district" id="district" class="form-control" required>
+                            <option value="">Select District</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Password</label>
+                        <div class="input-group">
+                            <input type="password" name="password" id="password" class="form-control" required oninput="validatePassword()">
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility()">
+                                <i class="bi bi-eye-slash" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                        <div id="passwordChecklist" class="mt-2 text-muted small">
+                            <div id="length" class="invalid">✔ At least 8 characters</div>
+                            <div id="uppercase" class="invalid">✔ One uppercase letter</div>
+                            <div id="number" class="invalid">✔ One number</div>
+                            <div id="special" class="invalid">✔ One special character (!@#$...)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send-check me-1"></i> Place Order
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Cancel
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" th:if="${success}">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-check2-circle me-2"></i>Order Successful</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p th:text="${success}">Success message</p>
+                <p th:if="${totalCost}">
+                    <strong>Total Cost of All Your Orders:</strong>
+                    <span th:text="'TSH ' + ${#numbers.formatDecimal(totalCost, 0, 'COMMA', 0, 'POINT')}"></span>
+                </p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button class="btn btn-primary" onclick="showOrderLoginForm()">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Confirm to View Your Orders
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="orderLoginModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/orders/login}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-person-check me-2"></i>Confirm to View Orders</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Phone Number or Last Name</label>
+                        <input type="text" name="identifier" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-unlock me-1"></i> Login
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-dark text-white text-center py-3">
+    <div>&copy; 2025 The Sky Online Service</div>
+    <div>Developed by <a href="mailto:meshackvenance99@gmail.com" class="text-info text-decoration-none">Mr. Meshack Venance</a></div>
 </footer>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showOrderForm() {
+        const modal = new bootstrap.Modal(document.getElementById('orderFormModal'));
+        modal.show();
+    }
 
+    function showOrderLoginForm() {
+        const loginModal = new bootstrap.Modal(document.getElementById('orderLoginModal'));
+        loginModal.show();
+    }
+
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById("password");
+        const toggleIcon = document.getElementById("toggleIcon");
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.classList.remove("bi-eye-slash");
+            toggleIcon.classList.add("bi-eye");
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.classList.remove("bi-eye");
+            toggleIcon.classList.add("bi-eye-slash");
+        }
+    }
+
+    function validatePassword() {
+        const password = document.getElementById("password").value;
+        updateChecklist("length", password.length >= 8);
+        updateChecklist("uppercase", /[A-Z]/.test(password));
+        updateChecklist("number", /\d/.test(password));
+        updateChecklist("special", /[!@#$%^&*(),.?":{}|<>]/.test(password));
+    }
+
+    function updateChecklist(id, isValid) {
+        const element = document.getElementById(id);
+        if (isValid) {
+            element.classList.remove("invalid");
+            element.classList.add("valid");
+        } else {
+            element.classList.remove("valid");
+            element.classList.add("invalid");
+        }
+    }
+
+    const regionDistricts = {
+        "Dar es Salaam": ["Ilala", "Kinondoni", "Temeke", "Ubungo", "Kigamboni"],
+        "Arusha": ["Arusha Urban", "Arumeru", "Monduli", "Karatu", "Longido", "Ngorongoro"],
+        "Dodoma": ["Dodoma Urban", "Bahi", "Chamwino", "Chemba", "Kondoa", "Mpwapwa"],
+        "Mwanza": ["Ilemela", "Nyamagana", "Kwimba", "Sengerema", "Magu"],
+        "Mbeya": ["Mbeya Urban", "Rungwe", "Chunya", "Kyela", "Mbarali"],
+    };
+
+    function populateRegions() {
+        const regionSelect = document.getElementById("region");
+        Object.keys(regionDistricts).forEach(region => {
+            const option = document.createElement("option");
+            option.value = region;
+            option.text = region;
+            regionSelect.add(option);
+        });
+    }
+
+    function updateDistricts() {
+        const region = document.getElementById("region").value;
+        const districtSelect = document.getElementById("district");
+        districtSelect.innerHTML = '<option value="">Select District</option>';
+        if (region && regionDistricts[region]) {
+            regionDistricts[region].forEach(district => {
+                const option = document.createElement("option");
+                option.value = district;
+                option.text = district;
+                districtSelect.add(option);
+            });
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const successModal = document.getElementById('successModal');
+        if (successModal) {
+            const modal = new bootstrap.Modal(successModal);
+            modal.show();
+        }
+
+        populateRegions();
+
+        const phoneInput = document.querySelector('input[name="phoneNumber"]');
+        const phoneHint = document.getElementById("phoneHint");
+        phoneInput.addEventListener('input', () => {
+            const isValid = /^0(6|7|8)[0-9]{8}$/.test(phoneInput.value);
+            phoneHint.style.color = isValid ? "green" : "gray";
+        });
+    });
+</script>
 </body>
 </html>

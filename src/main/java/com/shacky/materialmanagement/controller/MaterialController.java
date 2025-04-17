@@ -1,12 +1,8 @@
 package com.shacky.materialmanagement.controller;
 
-import com.shacky.materialmanagement.entity.Admin;
-import com.shacky.materialmanagement.entity.Material;
-import com.shacky.materialmanagement.entity.OnlineService;
+import com.shacky.materialmanagement.entity.*;
 import com.shacky.materialmanagement.repository.AdminRepository;
-import com.shacky.materialmanagement.service.AdminService;
-import com.shacky.materialmanagement.service.MaterialService;
-import com.shacky.materialmanagement.service.OnlineServiceService;
+import com.shacky.materialmanagement.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,6 +43,12 @@ public class MaterialController {
     @Autowired
     private OnlineServiceService onlineServiceService;
 
+    @Autowired
+    private ServiceOrderService serviceOrderService;
+
+    @Autowired
+    private CommentService commentService;
+
     @GetMapping("/")
     public String homePage(Model model) {
         List<Material> materials = materialService.getAllMaterials();
@@ -80,11 +82,13 @@ public class MaterialController {
     @PostMapping("/admin/services/add")
     public String addOnlineService(@RequestParam("title") String title,
                                    @RequestParam("requirements") String requirements,
+                                   @RequestParam("cost") Integer cost,
                                    RedirectAttributes redirectAttributes) {
         try {
             OnlineService onlineService = new OnlineService();
             onlineService.setTitle(title);
             onlineService.setRequirements(requirements);
+            onlineService.setCost(cost);
             onlineServiceService.saveService(onlineService);
 
             redirectAttributes.addFlashAttribute("serviceSuccess", "Service added successfully!");
@@ -211,12 +215,14 @@ public class MaterialController {
     public String updateOnlineService(@RequestParam Long id,
                                       @RequestParam String title,
                                       @RequestParam String requirements,
+                                      @RequestParam Integer cost,
                                       RedirectAttributes redirectAttributes) {
         try {
             OnlineService existing = onlineServiceService.getService(id);
             if (existing != null) {
                 existing.setTitle(title);
                 existing.setRequirements(requirements);
+                existing.setCost(cost);
                 onlineServiceService.saveService(existing);
                 redirectAttributes.addFlashAttribute("serviceSuccess", "Service updated successfully.");
             } else {
@@ -231,8 +237,13 @@ public class MaterialController {
     public String viewServices(Model model) {
         List<OnlineService> services = onlineServiceService.getAllServices();
         model.addAttribute("services", services);
+
+        List<Comment> comments = commentService.getAllComments();  // Assuming this method exists
+        model.addAttribute("comments", comments);
+
         return "services";
     }
+
     @PostMapping("/admin/change-password")
     public String changePassword(HttpServletRequest request,
                                  @RequestParam String currentPassword,
@@ -266,7 +277,44 @@ public class MaterialController {
         redirectAttributes.addFlashAttribute("passwordSuccess", "Password changed successfully.");
         return "redirect:/admin";
     }
+//    @GetMapping("/admin/orders")
+//    public String viewCustomerOrders(Model model) {
+//        List<ServiceOrder> orders = serviceOrderService.findAll(); // Adjust based on your service logic
+//        model.addAttribute("orders", orders);
+//        return "admin-orders"; // This is the template name
+//    }
+    @PostMapping("/admin/orders/update-status/{orderId}")
+    public String updateOrderStatus(@PathVariable Long orderId,
+                                    @RequestParam String status,
+                                    RedirectAttributes redirectAttributes) {
+        boolean success = serviceOrderService.updateOrderStatus(orderId, status);
+        if (success) {
+            redirectAttributes.addFlashAttribute("statusMessage", "Order status updated successfully.");
+        } else {
+            redirectAttributes.addFlashAttribute("statusError", "Order not found.");
+        }
+        return "redirect:/admin/orders";
+    }
+    @GetMapping("/admin/orders")
+    public String viewFilteredOrders(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long serviceId,
+            @RequestParam(required = false, defaultValue = "datePlaced") String sort,
+            @RequestParam(required = false, defaultValue = "desc") String direction,
+            Model model) {
 
+        List<ServiceOrder> filteredOrders = serviceOrderService.getFilteredAndSortedOrders(status, serviceId, sort, direction);
+        List<OnlineService> allServices = onlineServiceService.getAllServices();
+
+        model.addAttribute("orders", filteredOrders);
+        model.addAttribute("services", allServices);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedServiceId", serviceId);
+        model.addAttribute("sortedBy", sort);
+        model.addAttribute("sortDirection", direction);
+
+        return "admin-orders";
+    }
 
     // logout
     @GetMapping("/admin/logout")
