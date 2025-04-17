@@ -1,14 +1,12 @@
-# Use lightweight Java image
-FROM eclipse-temurin:17-jdk-alpine
-
-# Set working directory in the container
+# Build stage
+FROM maven:3.9.5-eclipse-temurin-17-alpine AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Copy the built JAR into the container
-COPY target/materialmanagement-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the port your app runs on
+# Run stage
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /app
+COPY --from=build /app/target/materialmanagement-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
-
-# Start the app
 ENTRYPOINT ["java", "-jar", "app.jar"]
