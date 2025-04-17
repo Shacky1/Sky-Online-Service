@@ -2,8 +2,10 @@ package com.shacky.materialmanagement.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,14 +27,14 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/download/**","/services","/orders/place","/orders/details/{id}","/orders/details","/orders/login"
-                                ,"/orders/**","/comments/**"
-                                ,"/orders/add-service/{serviceId}","/orders/logout", "/admin/login","/service/{id}", "/css/**","/images/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/download/**", "/services", "/orders/place", "/orders/details/{id}", "/orders/details", "/orders/login",
+                                "/orders/**", "/comments/**",
+                                "/orders/add-service/{serviceId}", "/orders/logout", "/admin/login", "/service/{id}", "/css/**", "/images/**", "/js/**").permitAll()
                         .requestMatchers("/admin/**").authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/admin/login")
-                        .loginProcessingUrl("/admin/login") // Spring handles this
+                        .loginProcessingUrl("/admin/login")
                         .defaultSuccessUrl("/admin", true)
                         .failureUrl("/admin/login?error=true")
                         .permitAll()
@@ -56,5 +58,10 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }
