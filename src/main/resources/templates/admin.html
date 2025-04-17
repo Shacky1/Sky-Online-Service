@@ -2,36 +2,30 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Sky Online - Admin</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
+
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="/images/kyline-logo.jpeg" alt="Sky Logo" style="height: 40px; margin-right: 10px;">
-            The Sky
+            <img src="/images/kyline-logo.jpeg" alt="Sky Logo" height="40" class="me-2">The Sky
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/}"><i class="bi bi-house-door-fill me-1"></i>Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/admin/orders}"><i class="bi bi-card-list me-1"></i>View Orders</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/}"><i class="bi bi-house me-1"></i>Home</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/orders}"><i class="bi bi-list-check me-1"></i>Orders</a></li>
                 <li class="nav-item">
                     <form th:action="@{/admin/logout}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-outline-light btn-sm ms-3">
-                            <i class="bi bi-box-arrow-right me-1"></i>Logout
-                        </button>
+                        <button class="btn btn-outline-light btn-sm ms-3" type="submit"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
                     </form>
                 </li>
             </ul>
@@ -39,186 +33,183 @@
     </div>
 </nav>
 
-<section class="admin-section py-5">
+<!-- Main Section -->
+<section class="py-5">
     <div class="container">
-        <div class="row justify-content-center g-5">
+        <div class="row g-5 justify-content-center">
 
             <!-- Left Column -->
             <div class="col-md-6">
 
                 <!-- Upload Announcement -->
-                <div class="form-container mb-5">
-                    <h2 class="mb-4 text-center"><i class="bi bi-upload me-2"></i>Upload Announcement</h2>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title text-center mb-3"><i class="bi bi-upload me-1"></i>Upload Announcement</h4>
+                        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+                        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-                    <div th:if="${successMessage}" class="alert alert-success text-center" th:text="${successMessage}"></div>
-                    <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
-
-                    <form th:action="@{/admin/upload}" method="post" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label class="form-label">Title</label>
-                            <input type="text" class="form-control" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Upload File</label>
-                            <input type="file" class="form-control" name="file" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Valid For (days)</label>
-                            <input type="number" class="form-control" name="validDays" required min="1" max="365">
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-cloud-arrow-up-fill me-1"></i>Upload
-                        </button>
-                    </form>
+                        <form th:action="@{/admin/upload}" method="post" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">File</label>
+                                <input type="file" class="form-control" name="file" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Valid Days</label>
+                                <input type="number" class="form-control" name="validDays" min="1" max="365" required>
+                            </div>
+                            <button class="btn btn-primary w-100" type="submit"><i class="bi bi-cloud-arrow-up-fill me-1"></i>Upload</button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Change Password -->
-                <div class="form-container">
-                    <h2 class="mb-4 text-center"><i class="bi bi-key-fill me-2"></i>Change Password</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-center mb-3"><i class="bi bi-key me-1"></i>Change Password</h4>
+                        <div th:if="${passwordSuccess}" class="alert alert-success" th:text="${passwordSuccess}"></div>
+                        <div th:if="${passwordError}" class="alert alert-danger" th:text="${passwordError}"></div>
 
-                    <div th:if="${passwordSuccess}" class="alert alert-success text-center" th:text="${passwordSuccess}"></div>
-                    <div th:if="${passwordError}" class="alert alert-danger text-center" th:text="${passwordError}"></div>
+                        <form th:action="@{/admin/change-password}" method="post" onsubmit="return validatePassword();">
+                            <div class="mb-3">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-control" name="currentPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                <small class="form-text text-muted">At least 8 characters, include upper/lowercase, number, and symbol.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                            </div>
+                            <div id="passwordErrorMsg" class="text-danger mb-2 d-none"></div>
 
-                    <form th:action="@{/admin/change-password}" method="post" onsubmit="return validatePassword();">
-                        <div class="mb-3">
-                            <label class="form-label">Current Password</label>
-                            <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="newPassword" name="newPassword" required
-                                   minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{8,}">
-                            <small class="text-muted">
-                                Must be at least 8 characters and include uppercase, lowercase, number, and symbol.
-                            </small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                        </div>
-                        <div id="passwordErrorMsg" class="text-danger mb-2 d-none"></div>
+                            <ul id="passwordChecklist" class="list-unstyled small">
+                                <li class="text-danger" data-label="At least 8 characters">❌ At least 8 characters</li>
+                                <li class="text-danger" data-label="Lowercase letter">❌ Lowercase letter</li>
+                                <li class="text-danger" data-label="Uppercase letter">❌ Uppercase letter</li>
+                                <li class="text-danger" data-label="Number">❌ Number</li>
+                                <li class="text-danger" data-label="Special character">❌ Special character</li>
+                            </ul>
 
-                        <ul id="passwordRequirements" class="list-unstyled small">
-                            <li class="text-danger" data-label="At least 8 characters">❌ At least 8 characters</li>
-                            <li class="text-danger" data-label="Lowercase letter">❌ Lowercase letter</li>
-                            <li class="text-danger" data-label="Uppercase letter">❌ Uppercase letter</li>
-                            <li class="text-danger" data-label="Number">❌ Number</li>
-                            <li class="text-danger" data-label="Special character">❌ Special character</li>
-                        </ul>
-
-                        <button type="submit" class="btn btn-warning w-100">
-                            <i class="bi bi-shield-lock-fill me-1"></i>Change Password
-                        </button>
-                    </form>
+                            <button class="btn btn-warning w-100" type="submit"><i class="bi bi-shield-lock me-1"></i>Change Password</button>
+                        </form>
+                    </div>
                 </div>
+
             </div>
 
             <!-- Right Column -->
             <div class="col-md-6">
 
-                <!-- Add or Edit Online Service -->
-                <div class="form-container mb-5">
-                    <h2 class="mb-4 text-center">
-                        <i class="bi bi-pencil-square me-2"></i>
-                        <span th:text="${editService != null} ? 'Edit Online Service' : 'Add Online Service'">Add Online Service</span>
-                    </h2>
+                <!-- Add/Edit Service -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title text-center mb-3">
+                            <i class="bi bi-pencil-square me-1"></i>
+                            <span th:text="${editService != null} ? 'Edit Online Service' : 'Add Online Service'">Add Online Service</span>
+                        </h4>
 
-                    <form th:action="@{${editService != null} ? '/admin/services/update' : '/admin/services/add'}" method="post">
-                        <div th:if="${serviceSuccess}" class="alert alert-success text-center" th:text="${serviceSuccess}"></div>
-                        <div th:if="${serviceError}" class="alert alert-danger text-center" th:text="${serviceError}"></div>
+                        <form th:action="@{${editService != null} ? '/admin/services/update' : '/admin/services/add'}" method="post">
+                            <div th:if="${serviceSuccess}" class="alert alert-success" th:text="${serviceSuccess}"></div>
+                            <div th:if="${serviceError}" class="alert alert-danger" th:text="${serviceError}"></div>
 
-                        <input type="hidden" name="id" th:value="${editService?.id}">
-                        <div class="mb-3">
-                            <label class="form-label">Service Title</label>
-                            <input type="text" class="form-control" name="title" th:value="${editService?.title}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Requirements / Description</label>
-                            <textarea class="form-control" name="requirements" rows="4" th:text="${editService?.requirements}" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Service Cost</label>
-                            <input type="number" class="form-control" name="cost" th:value="${editService?.cost}" min="0" required>
-                        </div>
+                            <input type="hidden" name="id" th:value="${editService?.id}">
+                            <div class="mb-3">
+                                <label class="form-label">Service Title</label>
+                                <input type="text" class="form-control" name="title" th:value="${editService?.title}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Requirements / Description</label>
+                                <textarea class="form-control" name="requirements" rows="4" th:text="${editService?.requirements}" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Cost (TSH)</label>
+                                <input type="number" class="form-control" name="cost" min="0" th:value="${editService?.cost}" required>
+                            </div>
 
-                        <button type="submit" class="btn btn-success w-100">
-                            <i class="bi bi-save-fill me-1"></i>
-                            <span th:text="${editService != null} ? 'Update Service' : 'Add Service'">Add Service</span>
-                        </button>
-                    </form>
+                            <button class="btn btn-success w-100" type="submit">
+                                <i class="bi bi-save-fill me-1"></i>
+                                <span th:text="${editService != null} ? 'Update Service' : 'Add Service'">Add Service</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Service List -->
                 <div>
-                    <h3 class="text-center"><i class="bi bi-list-task me-2"></i>Existing Services</h3>
+                    <h4 class="text-center mb-3"><i class="bi bi-list-task me-1"></i>Existing Services</h4>
                     <div th:if="${services != null and !services.isEmpty()}">
                         <ul class="list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-start"
-                                th:each="service : ${services}">
+                            <li class="list-group-item d-flex justify-content-between" th:each="service : ${services}">
                                 <div>
-                                    <h5 th:text="${service.title}">Service Title</h5>
-                                    <p th:text="${service.requirements}">Service Description</p>
-                                    <p><strong>Cost:</strong>
-                                        <span th:if="${service.cost == null}">Not assigned</span>
+                                    <h5 th:text="${service.title}">Title</h5>
+                                    <p th:text="${service.requirements}">Description</p>
+                                    <p>
+                                        <strong>Cost:</strong>
                                         <span th:if="${service.cost == 0}">Free</span>
-                                        <span th:if="${service.cost > 0}"
-                                              th:text="'TSH ' + ${#numbers.formatDecimal(service.cost, 0, 'COMMA', 0, 'POINT')}">TSH 0</span>
+                                        <span th:if="${service.cost > 0}" th:text="'TSH ' + ${#numbers.formatDecimal(service.cost, 0, 'COMMA', 0, 'POINT')}">Cost</span>
                                     </p>
                                 </div>
-                                <div>
-                                    <a th:href="@{'/admin/services/edit/' + ${service.id}}" class="btn btn-warning btn-sm me-2">
-                                        <i class="bi bi-pencil-fill"></i> Edit
+                                <div class="d-flex align-items-start">
+                                    <a th:href="@{'/admin/services/edit/' + ${service.id}}" class="btn btn-sm btn-warning me-2">
+                                        <i class="bi bi-pencil"></i>
                                     </a>
-                                    <a th:href="@{'/admin/services/delete/' + ${service.id}}"
-                                       onclick="return confirm('Are you sure you want to delete this service?');"
-                                       class="btn btn-danger btn-sm">
-                                        <i class="bi bi-trash-fill"></i> Delete
+                                    <a th:href="@{'/admin/services/delete/' + ${service.id}}" onclick="return confirm('Delete this service?');" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i>
                                     </a>
                                 </div>
                             </li>
                         </ul>
                     </div>
                     <div th:if="${services == null or services.isEmpty()}" class="alert alert-info text-center">
-                        No online services added yet.
+                        No services added yet.
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
 
-<footer class="footer mt-5">
-    <div class="container text-center py-3">
-        &copy; 2025 The Sky Online Service. All rights reserved.
-    </div>
+<!-- Footer -->
+<footer class="bg-light text-center py-3 mt-5">
+    &copy; 2025 The Sky Online Service. All rights reserved.
 </footer>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    let editing = [[${editService != null}]];
-    if (editing) {
-        window.scrollTo(0, document.querySelector("form").offsetTop - 100);
-    }
-
+<!-- Scripts -->
+<script>
     function validatePassword() {
         const newPassword = document.getElementById('newPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         const errorMsg = document.getElementById('passwordErrorMsg');
+        const checklistItems = document.querySelectorAll('#passwordChecklist li');
 
-        const requirements = [
-            { regex: /.{8,}/, label: "At least 8 characters" },
-            { regex: /[a-z]/, label: "Lowercase letter" },
-            { regex: /[A-Z]/, label: "Uppercase letter" },
-            { regex: /\d/, label: "Number" },
-            { regex: /[^a-zA-Z0-9]/, label: "Special character" }
+        const rules = [
+            { regex: /.{8,}/, label: 'At least 8 characters' },
+            { regex: /[a-z]/, label: 'Lowercase letter' },
+            { regex: /[A-Z]/, label: 'Uppercase letter' },
+            { regex: /\d/, label: 'Number' },
+            { regex: /[^a-zA-Z0-9]/, label: 'Special character' }
         ];
 
-        for (const req of requirements) {
-            if (!req.regex.test(newPassword)) {
-                errorMsg.textContent = "Missing requirement: " + req.label;
-                errorMsg.classList.remove("d-none");
-                return false;
-            }
+        let valid = true;
+        checklistItems.forEach((item, i) => {
+            const passed = rules[i].regex.test(newPassword);
+            item.className = passed ? 'text-success' : 'text-danger';
+            item.innerHTML = (passed ? '✅' : '❌') + ' ' + item.getAttribute('data-label');
+            if (!passed) valid = false;
+        });
+
+        if (!valid) {
+            errorMsg.textContent = "Password doesn't meet all requirements.";
+            errorMsg.classList.remove("d-none");
+            return false;
         }
 
         if (newPassword !== confirmPassword) {
@@ -232,28 +223,10 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        const newPassword = document.getElementById("newPassword");
-        const feedbackList = document.getElementById("passwordRequirements").querySelectorAll("li");
-
-        newPassword.addEventListener("keyup", () => {
-            const value = newPassword.value;
-            const rules = [/.{8,}/, /[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z0-9]/];
-
-            rules.forEach((regex, i) => {
-                if (regex.test(value)) {
-                    feedbackList[i].classList.remove("text-danger");
-                    feedbackList[i].classList.add("text-success");
-                    feedbackList[i].innerHTML = "✅ " + feedbackList[i].getAttribute("data-label");
-                } else {
-                    feedbackList[i].classList.remove("text-success");
-                    feedbackList[i].classList.add("text-danger");
-                    feedbackList[i].innerHTML = "❌ " + feedbackList[i].getAttribute("data-label");
-                }
-            });
-        });
+        document.getElementById("newPassword").addEventListener("input", validatePassword);
     });
-    /*]]>*/
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
