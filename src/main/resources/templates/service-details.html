@@ -249,13 +249,33 @@
         item.classList.toggle("invalid", !isValid);
     }
 
-    const regionDistricts = {
-        "Dar es Salaam": ["Ilala", "Kinondoni", "Temeke", "Ubungo", "Kigamboni"],
-        "Arusha": ["Arusha Urban", "Arumeru", "Monduli", "Karatu", "Longido", "Ngorongoro"],
-        "Dodoma": ["Dodoma Urban", "Bahi", "Chamwino", "Chemba", "Kondoa", "Mpwapwa"],
-        "Mwanza": ["Ilemela", "Nyamagana", "Kwimba", "Sengerema", "Magu"],
-        "Mbeya": ["Mbeya Urban", "Rungwe", "Chunya", "Kyela", "Mbarali"]
-    };
+  const regionDistricts = {
+    "Arusha": ["Arusha Urban", "Arumeru", "Karatu", "Longido", "Monduli", "Ngorongoro"],
+    "Dar es Salaam": ["Ilala", "Kinondoni", "Temeke", "Ubungo", "Kigamboni"],
+    "Dodoma": ["Dodoma Urban", "Bahi", "Chamwino", "Chemba", "Kondoa", "Mpwapwa"],
+    "Geita": ["Geita", "Bukombe", "Chato", "Mbogwe", "Nyang'hwale"],
+    "Iringa": ["Iringa Urban", "Iringa Rural", "Kilolo", "Mafinga", "Mufindi"],
+    "Kagera": ["Bukoba Urban", "Bukoba Rural", "Biharamulo", "Karagwe", "Kyerwa", "Muleba", "Ngara"],
+    "Katavi": ["Mpanda", "Mlele", "Nsimbo", "Tanganyika"],
+    "Kigoma": ["Kibondo", "Kasulu", "Kakonko", "Buhigwe", "Kigoma Urban", "Kigoma Rural", "Uvinza"],
+    "Kilimanjaro": ["Moshi Urban", "Moshi Rural", "Hai", "Mwanga", "Same", "Rombo", "Siha"],
+    "Lindi": ["Lindi Urban", "Lindi Rural", "Kilwa", "Liwale", "Nachingwea", "Ruangwa"],
+    "Manyara": ["Babati Urban", "Babati Rural", "Hanang", "Kiteto", "Mbulu", "Simanjiro"],
+    "Mara": ["Musoma Urban", "Musoma Rural", "Tarime", "Rorya", "Serengeti", "Bunda", "Butiama"],
+    "Mbeya": ["Mbeya Urban", "Mbeya Rural", "Rungwe", "Kyela", "Chunya", "Mbarali", "Ileje", "Busokelo"],
+    "Morogoro": ["Morogoro Urban", "Morogoro Rural", "Kilosa", "Kilombero", "Mvomero", "Gairo", "Ulanga", "Malinyi", "Ifakara"],
+    "Mtwara": ["Mtwara Urban", "Mtwara Rural", "Masasi", "Tandahimba", "Newala", "Nanyumbu"],
+    "Mwanza": ["Ilemela", "Nyamagana", "Kwimba", "Sengerema", "Magu", "Misungwi", "Ukerewe"],
+    "Njombe": ["Njombe Urban", "Njombe Rural", "Makete", "Ludewa", "Wanging'ombe"],
+    "Pwani": ["Kibaha", "Kibiti", "Mkuranga", "Rufiji", "Bagamoyo", "Chalinze", "Kisarawe"],
+    "Rukwa": ["Sumbawanga Urban", "Sumbawanga Rural", "Nkasi", "Kalambo"],
+    "Ruvuma": ["Songea Urban", "Songea Rural", "Mbinga", "Namtumbo", "Nyasa", "Tunduru"],
+    "Shinyanga": ["Shinyanga Urban", "Shinyanga Rural", "Kahama", "Kishapu", "Msalala"],
+    "Simiyu": ["Bariadi", "Busega", "Itilima", "Maswa", "Meatu"],
+    "Singida": ["Singida Urban", "Singida Rural", "Iramba", "Manyoni", "Ikungi", "Mkalama"],
+    "Tabora": ["Tabora Urban", "Igunga", "Nzega", "Uyui", "Urambo", "Sikonge", "Kaliua"],
+    "Tanga": ["Tanga Urban", "Muheza", "Korogwe", "Lushoto", "Handeni", "Kilindi", "Mkinga", "Pangani"]
+};
 
     function populateRegions() {
         const regionSelect = document.getElementById("region");

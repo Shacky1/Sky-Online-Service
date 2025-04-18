@@ -17,7 +17,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 
-
 import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.io.*;
@@ -111,48 +110,81 @@ public class MaterialController {
         }
     }
 
-    // Handle file upload
     @PostMapping("/admin/upload")
     public String uploadMaterial(@RequestParam("file") MultipartFile file,
                                  @RequestParam("name") String name,
                                  @RequestParam("validDays") int validDays,
                                  RedirectAttributes redirectAttributes) {
         try {
-            String uploadDir = System.getProperty("user.dir") + "/uploads/";
-            File uploadPath = new File(uploadDir);
-            if (!uploadPath.exists()) uploadPath.mkdirs();
+            // Define upload directory
+            Path uploadDir = Paths.get(System.getProperty("user.dir"), "uploads");
+            Files.createDirectories(uploadDir); // Create dir if not exists
 
-            File dest = new File(uploadPath, file.getOriginalFilename());
-            file.transferTo(dest);
+            // Save the file
+            String fileName = file.getOriginalFilename();
+            Path filePath = uploadDir.resolve(fileName);
+            file.transferTo(filePath.toFile());
 
+            // Save only filename in DB
             Material material = new Material();
             material.setName(name);
-            material.setUrl(dest.getAbsolutePath());
+            material.setUrl(fileName); // Store only the filename, not full path
             material.setUploadTime(LocalDateTime.now());
             material.setValidUntil(LocalDateTime.now().plusDays(validDays));
             materialService.saveMaterial(material);
 
-            redirectAttributes.addFlashAttribute("successMessage", "Announcement uploaded successfully!");
+            redirectAttributes.addFlashAttribute("successMessage", "Material uploaded successfully!");
         } catch (IOException e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to upload Announcement.");
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to upload material.");
         }
 
         return "redirect:/admin";
     }
 
     // Handle file download
+//    @GetMapping("/download/{id}")
+//    public void downloadMaterial(@PathVariable Long id, HttpServletResponse response) throws IOException {
+//        Material material = materialService.getMaterial(id);
+//        if (material == null) {
+//            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Material not found");
+//            return;
+//        }
+//
+//        File file = new File(material.getUrl());
+//        if (!file.exists()) {
+//            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+//            return;
+//        }
+//
+//        response.setContentType("application/octet-stream");
+//        response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+//        response.setContentLengthLong(file.length());
+//
+//        try (InputStream inputStream = new FileInputStream(file);
+//             OutputStream outputStream = response.getOutputStream()) {
+//            inputStream.transferTo(outputStream);
+//        }
+//    }
     @GetMapping("/download/{id}")
     public void downloadMaterial(@PathVariable Long id, HttpServletResponse response) throws IOException {
         Material material = materialService.getMaterial(id);
         if (material == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Material not found");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Material not found in database");
             return;
         }
 
-        File file = new File(material.getUrl());
+        // Use only the filename stored in DB
+        String filename = material.getUrl();
+        Path filePath = Paths.get(System.getProperty("user.dir"), "uploads", filename);
+        File file = filePath.toFile();
+
+        // Debugging
+        System.out.println("Requested file path: " + filePath.toAbsolutePath());
+        System.out.println("File exists: " + file.exists());
+
         if (!file.exists()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found on server");
             return;
         }
 
@@ -163,8 +195,10 @@ public class MaterialController {
         try (InputStream inputStream = new FileInputStream(file);
              OutputStream outputStream = response.getOutputStream()) {
             inputStream.transferTo(outputStream);
+            outputStream.flush();
         }
     }
+
     @GetMapping("/files/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
@@ -277,12 +311,15 @@ public class MaterialController {
         redirectAttributes.addFlashAttribute("passwordSuccess", "Password changed successfully.");
         return "redirect:/admin";
     }
+
 //    @GetMapping("/admin/orders")
 //    public String viewCustomerOrders(Model model) {
 //        List<ServiceOrder> orders = serviceOrderService.findAll(); // Adjust based on your service logic
 //        model.addAttribute("orders", orders);
 //        return "admin-orders"; // This is the template name
+//
 //    }
+
     @PostMapping("/admin/orders/update-status/{orderId}")
     public String updateOrderStatus(@PathVariable Long orderId,
                                     @RequestParam String status,
@@ -295,6 +332,7 @@ public class MaterialController {
         }
         return "redirect:/admin/orders";
     }
+
     @GetMapping("/admin/orders")
     public String viewFilteredOrders(
             @RequestParam(required = false) String status,
