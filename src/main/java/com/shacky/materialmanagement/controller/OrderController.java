@@ -11,7 +11,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
 
+
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -211,8 +214,11 @@ public class OrderController {
             document.open();
 
             // Logo
-            String logoPath = "src/main/resources/static/images/kyline-logo.jpeg"; // adjust path
-            Image logo = Image.getInstance(logoPath);
+//            String logoPath = "src/main/resources/static/images/kyline-logo.jpeg"; // adjust path
+//            Image logo = Image.getInstance(logoPath);
+            InputStream logoStream = getClass().getResourceAsStream("/static/images/kyline-logo.jpeg");
+            Image logo = Image.getInstance(IOUtils.toByteArray(logoStream));
+
             logo.scaleAbsolute(100, 100);
             logo.setAlignment(Image.ALIGN_CENTER);
             document.add(logo);
