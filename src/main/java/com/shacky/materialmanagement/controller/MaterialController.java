@@ -116,19 +116,17 @@ public class MaterialController {
                                  @RequestParam("validDays") int validDays,
                                  RedirectAttributes redirectAttributes) {
         try {
-            // Define upload directory
-            Path uploadDir = Paths.get(System.getProperty("user.dir"), "uploads");
-            Files.createDirectories(uploadDir); // Create dir if not exists
+            // Use /data/uploads as persistent storage on Render
+            Path uploadDir = Paths.get("/data/uploads");
+            Files.createDirectories(uploadDir);
 
-            // Save the file
             String fileName = file.getOriginalFilename();
             Path filePath = uploadDir.resolve(fileName);
             file.transferTo(filePath.toFile());
 
-            // Save only filename in DB
             Material material = new Material();
             material.setName(name);
-            material.setUrl(fileName); // Store only the filename, not full path
+            material.setUrl(fileName); // Only filename in DB
             material.setUploadTime(LocalDateTime.now());
             material.setValidUntil(LocalDateTime.now().plusDays(validDays));
             materialService.saveMaterial(material);
@@ -174,12 +172,10 @@ public class MaterialController {
             return;
         }
 
-        // Use only the filename stored in DB
         String filename = material.getUrl();
-        Path filePath = Paths.get(System.getProperty("user.dir"), "uploads", filename);
+        Path filePath = Paths.get("/data/uploads", filename); // Updated to persistent path
         File file = filePath.toFile();
 
-        // Debugging
         System.out.println("Requested file path: " + filePath.toAbsolutePath());
         System.out.println("File exists: " + file.exists());
 
@@ -198,6 +194,7 @@ public class MaterialController {
             outputStream.flush();
         }
     }
+
 
     @GetMapping("/files/{filename:.+}")
     @ResponseBody
