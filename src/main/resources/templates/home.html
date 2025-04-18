@@ -79,6 +79,10 @@
                          alt="Preview"/>
                     <div class="card-body position-relative">
                         <h5 class="card-title" th:text="${material.name}">Material Name</h5>
+                        <span class="star-badge"
+                              th:if="${material.uploadTime != null and T(java.time.temporal.ChronoUnit).DAYS.between(material.uploadTime, T(java.time.LocalDateTime).now()) == 0}">
+                            NEW
+                        </span>
 
                         <!-- Display time remaining before expiration -->
                         <p class="text-danger small mb-1 fw-bold">

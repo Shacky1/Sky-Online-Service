@@ -2,9 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - The Sky Online</title>
+
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -15,23 +24,27 @@
         .logo-img {
             height: 40px;
         }
-        .upload-form {
-            display: none;
-            margin-top: 15px;
-        }
     </style>
 </head>
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container d-flex justify-content-between">
-        <a class="navbar-brand" href="/">
-            <img src="/images/kyline-logo.jpeg" class="logo-img" alt="Logo"> The Sky
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="/images/kyline-logo.jpeg" class="logo-img me-2" alt="Logo"> The Sky
         </a>
-        <div>
-            <a class="btn btn-outline-light me-2" href="/">Home <i class="bi bi-house-door"></i></a>
-            <a th:if="${session.loggedInCustomer != null}" class="btn btn-outline-light" href="/orders/logout">Logout <i class="bi bi-box-arrow-right"></i></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
+                aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarMenu">
+            <div class="ms-auto d-flex">
+                <a class="btn btn-outline-light me-2" href="/"><i class="bi bi-house-door me-1"></i> Home</a>
+                <a th:if="${session.loggedInCustomer != null}" class="btn btn-outline-light" href="/orders/logout">
+                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                </a>
+            </div>
         </div>
     </div>
 </nav>
@@ -44,67 +57,49 @@
         <p class="lead">Below are the services you’ve ordered</p>
     </div>
 </section>
-
 <!-- Orders Section -->
 <section class="container mb-5">
     <div th:if="${orders.isEmpty()}">
         <p class="text-center text-muted">You have no orders yet. <i class="bi bi-file-earmark-x"></i></p>
     </div>
 
-    <div th:each="order : ${orders}" class="card order-card mb-4 shadow-sm">
-        <div class="card-body">
-            <h5 class="card-title">
-                <i class="bi bi-clipboard-check"></i>
-                <span th:text="${order.service.title}">Service Title</span>
-            </h5>
+    <div class="row">
+        <div th:each="order : ${orders}" class="col-12 mb-4">
+            <div class="card order-card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-clipboard-check me-2"></i>
+                        <span th:text="${order.service.title}">Service Title</span>
+                    </h5>
 
-            <p class="mb-1">
-                <strong>Status:</strong>
-                <span th:text="${order.status}">Pending</span>
-            </p>
-            <p class="mb-1">
-                <strong>Date Placed:</strong>
-                <span th:text="${#temporals.format(order.datePlaced, 'dd MMM yyyy HH:mm')}">15 Apr 2025</span>
-            </p>
-            <p class="mb-1" th:if="${order.service.cost != null}">
-                <strong>Cost:</strong> TSH
-                <span th:text="${#numbers.formatDecimal(order.service.cost, 0, 'COMMA', 0, 'POINT')}">0</span>
-            </p>
+                    <p class="mb-1"><strong>Status:</strong> <span th:text="${order.status}">Pending</span></p>
+                    <p class="mb-1"><strong>Date Placed:</strong>
+                        <span th:text="${#temporals.format(order.datePlaced, 'dd MMM yyyy HH:mm')}">15 Apr 2025</span>
+                    </p>
+                    <p class="mb-1" th:if="${order.service.cost != null}">
+                        <strong>Cost:</strong> TSH
+                        <span th:text="${#numbers.formatDecimal(order.service.cost, 0, 'COMMA', 0, 'POINT')}">0</span>
+                    </p>
 
-            <!-- Cancel Button for Pending Orders -->
-            <form th:if="${order.status == 'Pending'}"
-                  th:action="@{'/orders/cancel/' + ${order.id}}"
-                  method="post"
-                  class="d-inline">
-                <button type="submit" class="btn btn-sm btn-danger mt-2">
-                    <i class="bi bi-x-circle"></i> Cancel Order
-                </button>
-            </form>
-<!--            &lt;!&ndash; Link to Upload Documents Form &ndash;&gt;-->
-<!--            <a href="#" class="btn btn-sm btn-warning mt-2" onclick="toggleUploadForm(event, 'upload-form-[[${order.id}]]')">-->
-<!--                <i class="bi bi-upload"></i> Upload Documents or Information-->
-<!--            </a>-->
+                    <div class="mt-3 d-flex flex-wrap gap-2">
+                        <!-- Cancel Button for Pending Orders -->
+                        <form th:if="${order.status == 'Pending'}"
+                              th:action="@{'/orders/cancel/' + ${order.id}}"
+                              method="post">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="bi bi-x-circle me-1"></i> Cancel Order
+                            </button>
+                        </form>
 
-            <!-- Download Button -->
-            <a th:href="@{'/orders/download/' + ${order.id}}"
-               class="btn btn-sm btn-outline-primary mt-2"
-               th:classappend="${order.status == 'Cancelled'} ? ' disabled' : ''">
-                <i class="bi bi-download"></i> Download Receipt (PDF)
-            </a>
-
-            <!-- Upload Form (Initially hidden) -->
-<!--            <div id="upload-form-[[${order.id}]]" class="upload-form">-->
-<!--                <form th:action="@{'/orders/upload/' + ${order.id}}" method="post" enctype="multipart/form-data" onsubmit="return validateForm([[${order.id}]])">-->
-<!--                    <div class="mb-3">-->
-<!--                        <label for="document-[[${order.id}]]" class="form-label">Select Document (Optional)</label>-->
-<!--                        <input type="file" class="form-control" name="document" id="document-[[${order.id}]]">-->
-<!--                    </div>-->
-<!--                    <div class="mb-3">-->
-<!--                        <textarea class="form-control" name="description" id="description-[[${order.id}]]" rows="3" placeholder="Add any information as required eg. NIDA number..." ></textarea>-->
-<!--                    </div>-->
-<!--                    <button type="submit" class="btn btn-success"><i class="bi bi-upload"></i> Submit</button>-->
-<!--                </form>-->
-<!--            </div>-->
+                        <!-- Download Button -->
+                        <a th:href="@{'/orders/download/' + ${order.id}}"
+                           class="btn btn-sm btn-outline-primary"
+                           th:classappend="${order.status == 'Cancelled'} ? ' disabled' : ''">
+                            <i class="bi bi-download me-1"></i> Download Receipt (PDF)
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -116,49 +111,53 @@
 
     <div class="text-center">
         <a href="/services" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add More Services
+            <i class="bi bi-plus-circle me-1"></i> Add More Services
         </a>
     </div>
 </section>
 
+<!-- Success Message -->
+<div th:if="${successMessage}" class="alert alert-success text-center" role="alert">
+    <span th:text="${successMessage}"></span>
+</div>
+
+<!-- General Comment Section -->
+<section class="container mb-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <strong>Leave a Comment <i class="bi bi-chat-dots"></i></strong>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/comments/post}" method="post">
+                <div class="mb-3">
+                    <textarea class="form-control" name="content" rows="3"
+                              placeholder="Write your thoughts about our services..." required></textarea>
+                </div>
+                <button class="btn btn-success" type="submit">
+                    <i class="bi bi-send me-1"></i> Submit Comment
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
 <!-- Footer -->
-<footer class="bg-dark text-white text-center py-3">
+<footer class="bg-dark text-white text-center py-3 mt-auto">
     <div>&copy; 2025 The Sky Online Service</div>
     <div>Developed by <a href="mailto:meshackvenance99@gmail.com" class="text-info text-decoration-none">Mr. Meshack Venance</a></div>
 </footer>
 
+<!-- Auto-hide Alert -->
 <script>
-    // Hide the alert after 4 seconds
     setTimeout(() => {
         const alert = document.querySelector('.alert');
         if (alert) {
             alert.style.display = 'none';
         }
     }, 4000);
-
-    // Function to toggle the display of the upload form
-    function toggleUploadForm(event, formId) {
-        event.preventDefault();
-        const form = document.getElementById(formId);
-        form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
-    }
-
-    // Validate the form to ensure at least one field is filled
-    function validateForm(orderId) {
-        const documentField = document.getElementById('document-' + orderId);
-        const descriptionField = document.getElementById('description-' + orderId);
-
-        if (!documentField.files.length && !descriptionField.value.trim()) {
-            alert('Please upload a document or provide written information.');
-            return false;
-        }
-        return true;
-    }
 </script>
 
-<!-- Scripts -->
+<!-- Bootstrap Bundle JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Bootstrap icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </body>
 </html>
