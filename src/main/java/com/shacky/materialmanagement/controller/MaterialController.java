@@ -140,30 +140,6 @@ public class MaterialController {
         return "redirect:/admin";
     }
 
-    // Handle file download
-//    @GetMapping("/download/{id}")
-//    public void downloadMaterial(@PathVariable Long id, HttpServletResponse response) throws IOException {
-//        Material material = materialService.getMaterial(id);
-//        if (material == null) {
-//            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Material not found");
-//            return;
-//        }
-//
-//        File file = new File(material.getUrl());
-//        if (!file.exists()) {
-//            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
-//            return;
-//        }
-//
-//        response.setContentType("application/octet-stream");
-//        response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
-//        response.setContentLengthLong(file.length());
-//
-//        try (InputStream inputStream = new FileInputStream(file);
-//             OutputStream outputStream = response.getOutputStream()) {
-//            inputStream.transferTo(outputStream);
-//        }
-//    }
     @GetMapping("/download/{id}")
     public void downloadMaterial(@PathVariable Long id, HttpServletResponse response) throws IOException {
         Material material = materialService.getMaterial(id);
@@ -308,14 +284,6 @@ public class MaterialController {
         redirectAttributes.addFlashAttribute("passwordSuccess", "Password changed successfully.");
         return "redirect:/admin";
     }
-
-//    @GetMapping("/admin/orders")
-//    public String viewCustomerOrders(Model model) {
-//        List<ServiceOrder> orders = serviceOrderService.findAll(); // Adjust based on your service logic
-//        model.addAttribute("orders", orders);
-//        return "admin-orders"; // This is the template name
-//
-//    }
 
     @PostMapping("/admin/orders/update-status/{orderId}")
     public String updateOrderStatus(@PathVariable Long orderId,

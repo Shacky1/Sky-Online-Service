@@ -37,7 +37,8 @@ public class MaterialService {
         List<Material> outdatedMaterials = materialRepository.findByValidUntilBefore(now);
 
         for (Material material : outdatedMaterials) {
-            File file = new File(material.getUrl());
+            // Construct full file path
+            File file = new File("/data/uploads", material.getUrl());
             if (file.exists()) {
                 file.delete();
             }
@@ -45,6 +46,7 @@ public class MaterialService {
             materialRepository.delete(material);
         }
     }
+
 
 
 }
