@@ -2,6 +2,7 @@ package com.shacky.materialmanagement.service;
 
 import com.shacky.materialmanagement.entity.Material;
 import com.shacky.materialmanagement.repository.MaterialRepository;
+import com.shacky.materialmanagement.util.FileStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +38,7 @@ public class MaterialService {
         List<Material> outdatedMaterials = materialRepository.findByValidUntilBefore(now);
 
         for (Material material : outdatedMaterials) {
-            // Construct full file path
-            File file = new File("/data/uploads", material.getUrl());
+            File file = new File(FileStorageUtil.UPLOAD_DIR, material.getUrl());
             if (file.exists()) {
                 file.delete();
             }
@@ -46,7 +46,5 @@ public class MaterialService {
             materialRepository.delete(material);
         }
     }
-
-
 
 }

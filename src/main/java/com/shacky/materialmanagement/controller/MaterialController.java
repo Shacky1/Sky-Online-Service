@@ -3,6 +3,7 @@ package com.shacky.materialmanagement.controller;
 import com.shacky.materialmanagement.entity.*;
 import com.shacky.materialmanagement.repository.AdminRepository;
 import com.shacky.materialmanagement.service.*;
+import com.shacky.materialmanagement.util.FileStorageUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletResponse;
@@ -116,9 +117,8 @@ public class MaterialController {
                                  @RequestParam("validDays") int validDays,
                                  RedirectAttributes redirectAttributes) {
         try {
-            // Use /data/uploads as persistent storage on Render
-            Path uploadDir = Paths.get("/data/uploads");
-            Files.createDirectories(uploadDir);
+            Path uploadDir = Paths.get(FileStorageUtil.UPLOAD_DIR);
+            Files.createDirectories(uploadDir); // Ensure directory exists
 
             String fileName = file.getOriginalFilename();
             Path filePath = uploadDir.resolve(fileName);
@@ -126,7 +126,7 @@ public class MaterialController {
 
             Material material = new Material();
             material.setName(name);
-            material.setUrl(fileName); // Only filename in DB
+            material.setUrl(fileName); // Save only the file name
             material.setUploadTime(LocalDateTime.now());
             material.setValidUntil(LocalDateTime.now().plusDays(validDays));
             materialService.saveMaterial(material);
@@ -149,7 +149,7 @@ public class MaterialController {
         }
 
         String filename = material.getUrl();
-        Path filePath = Paths.get("/data/uploads", filename); // Updated to persistent path
+        Path filePath = Paths.get(FileStorageUtil.UPLOAD_DIR, filename); // Use platform-specific path
         File file = filePath.toFile();
 
         System.out.println("Requested file path: " + filePath.toAbsolutePath());
@@ -170,7 +170,6 @@ public class MaterialController {
             outputStream.flush();
         }
     }
-
 
     @GetMapping("/files/{filename:.+}")
     @ResponseBody
