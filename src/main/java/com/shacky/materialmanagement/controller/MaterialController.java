@@ -117,18 +117,14 @@ public class MaterialController {
                                  @RequestParam("validDays") int validDays,
                                  RedirectAttributes redirectAttributes) {
         try {
-            Path uploadDir = Paths.get(FileStorageUtil.UPLOAD_DIR);
-            Files.createDirectories(uploadDir); // Ensure directory exists
-
-            String fileName = file.getOriginalFilename();
-            Path filePath = uploadDir.resolve(fileName);
-            file.transferTo(filePath.toFile());
-
             Material material = new Material();
             material.setName(name);
-            material.setUrl(fileName); // Save only the file name
+            material.setFileName(file.getOriginalFilename());
+            material.setContentType(file.getContentType());
+            material.setFileData(file.getBytes());
             material.setUploadTime(LocalDateTime.now());
             material.setValidUntil(LocalDateTime.now().plusDays(validDays));
+
             materialService.saveMaterial(material);
 
             redirectAttributes.addFlashAttribute("successMessage", "Material uploaded successfully!");
@@ -148,28 +144,16 @@ public class MaterialController {
             return;
         }
 
-        String filename = material.getUrl();
-        Path filePath = Paths.get(FileStorageUtil.UPLOAD_DIR, filename); // Use platform-specific path
-        File file = filePath.toFile();
+        response.setContentType(material.getContentType());
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + material.getFileName() + "\"");
+        response.setContentLength(material.getFileData().length);
 
-        System.out.println("Requested file path: " + filePath.toAbsolutePath());
-        System.out.println("File exists: " + file.exists());
-
-        if (!file.exists()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found on server");
-            return;
-        }
-
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
-        response.setContentLengthLong(file.length());
-
-        try (InputStream inputStream = new FileInputStream(file);
-             OutputStream outputStream = response.getOutputStream()) {
-            inputStream.transferTo(outputStream);
+        try (OutputStream outputStream = response.getOutputStream()) {
+            outputStream.write(material.getFileData());
             outputStream.flush();
         }
     }
+
 
     @GetMapping("/files/{filename:.+}")
     @ResponseBody

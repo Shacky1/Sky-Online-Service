@@ -1,77 +1,89 @@
 package com.shacky.materialmanagement.entity;
 
 import jakarta.persistence.*;
-
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-
 
 @Entity
 public class Material {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
-    private String url;
+
+    private String fileName;
+    private String contentType;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] fileData;
 
     @Column(nullable = false)
     private LocalDateTime validUntil;
 
     private LocalDateTime uploadTime;
 
-    public LocalDateTime getUploadTime() {
-        return uploadTime;
-    }
-
-    public void setUploadTime(LocalDateTime uploadTime) {
-        this.uploadTime = uploadTime;
-    }
-
-    public LocalDateTime getValidUntil() {
-        return validUntil;
-    }
-
-    public void setValidUntil(LocalDateTime validUntil) {
-        this.validUntil = validUntil;
-    }
-
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public byte[] getFileData() {
+        return fileData;
+    }
+
+    public LocalDateTime getValidUntil() {
+        return validUntil;
+    }
+
+    public LocalDateTime getUploadTime() {
+        return uploadTime;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getUrl() {
-        return url;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
-    @Transient
-    public String getFileName() {
-        // Ensure url is not null
-        if (this.url == null) return "";
-        return Paths.get(this.url).getFileName().toString();
+
+    public void setFileData(byte[] fileData) {
+        this.fileData = fileData;
+    }
+
+    public void setValidUntil(LocalDateTime validUntil) {
+        this.validUntil = validUntil;
+    }
+
+    public void setUploadTime(LocalDateTime uploadTime) {
+        this.uploadTime = uploadTime;
     }
 
     @Transient
     public boolean isImage() {
-        if (url == null) return false;
-        String extension = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+        if (fileName == null) return false;
+        String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
         return List.of("jpg", "jpeg", "png", "gif", "bmp", "webp").contains(extension);
     }
-
 }

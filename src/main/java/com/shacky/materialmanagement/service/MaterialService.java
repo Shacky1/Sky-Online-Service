@@ -22,29 +22,16 @@ public class MaterialService {
     }
 
     public Material getMaterial(Long id) {
-        Optional<Material> material = materialRepository.findById(id);
-        if (material.isPresent()) {
-            return material.get();
-        }
-        return null;  // Ensure this is correctly handled in your controller
+        return materialRepository.findById(id).orElse(null);
     }
-
 
     public Material saveMaterial(Material material) {
         return materialRepository.save(material);
     }
+
     public void removeOutdatedMaterials() {
         LocalDateTime now = LocalDateTime.now();
         List<Material> outdatedMaterials = materialRepository.findByValidUntilBefore(now);
-
-        for (Material material : outdatedMaterials) {
-            File file = new File(FileStorageUtil.UPLOAD_DIR, material.getUrl());
-            if (file.exists()) {
-                file.delete();
-            }
-
-            materialRepository.delete(material);
-        }
+        materialRepository.deleteAll(outdatedMaterials);
     }
-
 }
