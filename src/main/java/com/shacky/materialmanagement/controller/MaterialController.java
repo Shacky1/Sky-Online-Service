@@ -155,25 +155,22 @@ public class MaterialController {
     }
 
 
-    @GetMapping("/files/{filename:.+}")
-    @ResponseBody
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-        try {
-            Path file = Paths.get(System.getProperty("user.dir"), "uploads", filename);
-            Resource resource = new UrlResource(file.toUri());
-
-            if (resource.exists() || resource.isReadable()) {
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
-                        .contentType(MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM))
-                        .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.badRequest().build();
+    @GetMapping("/files/{fileName}")
+    public ResponseEntity<byte[]> getFile(@PathVariable String fileName) {
+        Optional<Material> materialOptional = materialService.getMaterialByFileName(fileName);
+        if (materialOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
+
+        Material material = materialOptional.get();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(material.getContentType()));
+        headers.setContentDisposition(ContentDisposition.inline().filename(fileName).build());
+
+        return new ResponseEntity<>(material.getFileData(), headers, HttpStatus.OK);
     }
+
     // Delete a service
     @GetMapping("/admin/services/delete/{id}")
     public String deleteOnlineService(@PathVariable Long id, RedirectAttributes redirectAttributes) {

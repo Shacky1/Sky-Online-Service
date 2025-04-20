@@ -72,11 +72,6 @@
         <div class="row g-3" th:if="${materials.size() > 0}">
             <div class="col-12 col-sm-6 col-md-4" th:each="material : ${materials}">
                 <div class="card material-card h-100">
-                    <img th:if="${material.image}"
-                         th:src="@{'/files/' + ${material.fileName}}"
-                         class="card-img-top"
-                         style="object-fit: cover; height: 200px;"
-                         alt="Preview"/>
                     <div class="card-body position-relative">
                         <h5 class="card-title" th:text="${material.name}">Material Name</h5>
                         <span class="star-badge"
