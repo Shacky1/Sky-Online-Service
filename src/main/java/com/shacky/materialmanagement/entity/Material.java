@@ -15,12 +15,13 @@ public class Material {
     private String fileName;
     private String contentType;
 
-    // @Lob
-    // @Column(columnDefinition = "LONGBLOB")
-    // private byte[] fileData;
     @Lob
-    @Column(columnDefinition = "BYTEA")
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] fileData;
+    // for postgresql
+    // @Lob
+    // @Column(columnDefinition = "BYTEA")
+    // private byte[] fileData;
 
     @Column(nullable = false)
     private LocalDateTime validUntil;
